@@ -17,8 +17,14 @@ export function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   const handleLogout = () => {
-    logout()
-    router.push('/')
+    try {
+      logout()
+      router.push('/')
+    } catch (error) {
+      console.error('Error during logout:', error)
+      // Still try to redirect even if logout fails
+      router.push('/')
+    }
   }
 
   const closeMobileMenu = () => {

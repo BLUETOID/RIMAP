@@ -632,9 +632,15 @@ export function AppProvider({ children }: { children: ReactNode }) {
   }
 
   const logout = () => {
-    setUser(null)
-    if (typeof window !== 'undefined') {
-      localStorage.removeItem('currentUser')
+    try {
+      console.log('Logout initiated')
+      setUser(null)
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('currentUser')
+        console.log('User data cleared from localStorage')
+      }
+    } catch (error) {
+      console.error('Error during logout:', error)
     }
   }
 
