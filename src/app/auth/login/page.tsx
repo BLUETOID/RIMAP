@@ -27,10 +27,23 @@ export default function LoginPage() {
     setError('')
 
     try {
-      const success = await login(formData.email, formData.password)
+      const result = await login(formData.email, formData.password)
       
-      if (success) {
-        router.push('/')
+      if (result.success && result.user) {
+        // Role-based redirect
+        switch (result.user.role) {
+          case 'admin':
+            router.push('/admin')
+            break
+          case 'alumni':
+            router.push('/dashboard/alumni')
+            break
+          case 'student':
+            router.push('/dashboard/student')
+            break
+          default:
+            router.push('/')
+        }
       } else {
         setError('Invalid email or password')
       }

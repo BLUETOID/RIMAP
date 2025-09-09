@@ -1,7 +1,46 @@
+'use client'
+
 import Link from 'next/link'
 import { HeroSection } from '../components/hero-section'
+import { useAppContext } from '../context/AppContext'
+import { useRouter } from 'next/navigation'
+import { useEffect } from 'react'
 
 export default function Home() {
+  const { isAuthenticated, user } = useAppContext()
+  const router = useRouter()
+
+  useEffect(() => {
+    if (isAuthenticated && user) {
+      // Redirect authenticated users to their role-specific dashboards
+      switch (user.role) {
+        case 'admin':
+          router.push('/admin')
+          break
+        case 'alumni':
+          router.push('/dashboard/alumni')
+          break
+        case 'student':
+          router.push('/dashboard/student')
+          break
+        default:
+          break
+      }
+    }
+  }, [isAuthenticated, user, router])
+
+  // Show loading spinner while redirecting authenticated users
+  if (isAuthenticated && user) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Redirecting to your dashboard...</p>
+        </div>
+      </div>
+    )
+  }
+  
   return (
     <div className="min-h-screen bg-gray-50">
       <HeroSection />

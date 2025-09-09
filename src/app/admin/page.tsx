@@ -1,7 +1,8 @@
 'use client'
 
 import { useAppContext } from '../../context/AppContext'
-import { useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { useState, useEffect } from 'react'
 
 export default function AdminPage() {
   const { 
@@ -14,14 +15,47 @@ export default function AdminPage() {
     alumni,
     events,
     donationRecords,
-    mentorshipRequests
+    mentorshipRequests,
+    // Gamification data
+    achievements,
+    allChallenges,
+    leaderboards,
+    pointTransactions,
+    getGamificationStats
   } = useAppContext()
   
+  const router = useRouter()
   const [activeTab, setActiveTab] = useState('overview')
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedDepartment, setSelectedDepartment] = useState('')
   const [selectedYear, setSelectedYear] = useState('')
   const [selectedStatus, setSelectedStatus] = useState('')
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      router.push('/auth/login')
+      return
+    }
+    
+    if (user?.role !== 'admin') {
+      // Redirect to appropriate dashboard based on role
+      if (user?.role === 'alumni') {
+        router.push('/dashboard/alumni')
+      } else if (user?.role === 'student') {
+        router.push('/dashboard/student')
+      } else {
+        router.push('/')
+      }
+    }
+  }, [isAuthenticated, user, router])
+
+  if (!isAuthenticated || user?.role !== 'admin') {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      </div>
+    )
+  }
 
   // Mock students data for admin management
   const [students] = useState([
@@ -155,6 +189,7 @@ export default function AdminPage() {
 
   const tabs = [
     { id: 'overview', name: 'Overview', icon: '📊' },
+    { id: 'gamification', name: 'Gamification', icon: '🎮' },
     { id: 'alumni', name: 'Alumni Management', icon: '🎓' },
     { id: 'students', name: 'Student Management', icon: '👨‍🎓' },
     { id: 'events', name: 'Events', icon: '📅' },
@@ -495,6 +530,176 @@ export default function AdminPage() {
                     ))}
                   </tbody>
                 </table>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Gamification Tab */}
+        {activeTab === 'gamification' && (
+          <div className="space-y-8">
+            {/* Gamification Stats Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-gray-600">Total Points Awarded</p>
+                    <p className="text-2xl font-bold text-gray-900">
+                      {pointTransactions.reduce((sum, t) => sum + t.points, 0).toLocaleString()}
+                    </p>
+                  </div>
+                  <div className="p-3 rounded-full bg-blue-100">
+                    <span className="text-2xl">⭐</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-gray-600">Active Challenges</p>
+                    <p className="text-2xl font-bold text-gray-900">
+                      {allChallenges.filter(c => c.isActive).length}
+                    </p>
+                  </div>
+                  <div className="p-3 rounded-full bg-green-100">
+                    <span className="text-2xl">🏆</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-gray-600">Achievements Unlocked</p>
+                    <p className="text-2xl font-bold text-gray-900">
+                      {pointTransactions.filter(t => t.action.includes('achievement')).length}
+                    </p>
+                  </div>
+                  <div className="p-3 rounded-full bg-yellow-100">
+                    <span className="text-2xl">🏅</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-gray-600">Point Transactions</p>
+                    <p className="text-2xl font-bold text-gray-900">{pointTransactions.length}</p>
+                  </div>
+                  <div className="p-3 rounded-full bg-purple-100">
+                    <span className="text-2xl">💫</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Leaderboard Overview */}
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+              <div className="p-6 border-b border-gray-200">
+                <h3 className="text-lg font-semibold text-gray-900">🏆 Top Performers</h3>
+                <p className="text-gray-600">Leading users by points</p>
+              </div>
+              <div className="p-6">
+                {leaderboards.length > 0 && leaderboards[0].entries.length > 0 ? (
+                  <div className="space-y-4">
+                    {leaderboards[0].entries.slice(0, 10).map((entry, index) => (
+                      <div key={entry.userId} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                        <div className="flex items-center space-x-4">
+                          <div className="text-2xl font-bold">
+                            {index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `#${index + 1}`}
+                          </div>
+                          <div>
+                            <h4 className="font-semibold text-gray-900">{entry.userName}</h4>
+                            <p className="text-sm text-gray-600 capitalize">
+                              {entry.userRole} • {entry.department} • {entry.graduationYear}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <div className="font-bold text-lg text-gray-900">{entry.points.toLocaleString()} pts</div>
+                          <div className="text-sm text-gray-600">{entry.level}</div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-8">
+                    <p className="text-gray-500">No leaderboard data available</p>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Recent Point Transactions */}
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+              <div className="p-6 border-b border-gray-200">
+                <h3 className="text-lg font-semibold text-gray-900">💫 Recent Point Transactions</h3>
+                <p className="text-gray-600">Latest point awards and activities</p>
+              </div>
+              <div className="p-6">
+                {pointTransactions.length > 0 ? (
+                  <div className="space-y-3">
+                    {pointTransactions.slice(-10).reverse().map((transaction) => (
+                      <div key={transaction.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                        <div className="flex items-center space-x-3">
+                          <div className="text-lg">
+                            {transaction.action.includes('login') ? '🔐' :
+                             transaction.action.includes('mentorship') ? '🤝' :
+                             transaction.action.includes('event') ? '📅' :
+                             transaction.action.includes('donation') ? '💰' : '⭐'}
+                          </div>
+                          <div>
+                            <p className="font-medium text-gray-900">{transaction.reason}</p>
+                            <p className="text-sm text-gray-600">
+                              {new Date(transaction.timestamp).toLocaleDateString()} at{' '}
+                              {new Date(transaction.timestamp).toLocaleTimeString()}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="font-bold text-green-600">+{transaction.points} pts</div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-8">
+                    <p className="text-gray-500">No point transactions yet</p>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Achievement Overview */}
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+              <div className="p-6 border-b border-gray-200">
+                <h3 className="text-lg font-semibold text-gray-900">🏅 Achievement System</h3>
+                <p className="text-gray-600">Available achievements and unlock rates</p>
+              </div>
+              <div className="p-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {achievements.map(achievement => {
+                    const unlockedCount = pointTransactions.filter(t => t.action === 'achievement_unlocked' && t.relatedId === achievement.id).length
+                    const totalUsers = alumni.length + 1 // +1 for current user if student
+                    const unlockRate = totalUsers > 0 ? (unlockedCount / totalUsers) * 100 : 0
+                    
+                    return (
+                      <div key={achievement.id} className="p-4 border border-gray-200 rounded-lg">
+                        <div className="flex items-center space-x-3 mb-2">
+                          <span className="text-2xl">{achievement.icon}</span>
+                          <div>
+                            <h4 className="font-semibold text-gray-900">{achievement.title}</h4>
+                            <p className="text-sm text-gray-600">{achievement.description}</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center justify-between text-sm">
+                          <span className="text-gray-600">{achievement.points} points</span>
+                          <span className="text-green-600">{unlockRate.toFixed(1)}% unlocked</span>
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
               </div>
             </div>
           </div>

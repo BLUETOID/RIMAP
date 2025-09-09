@@ -27,10 +27,20 @@ yarn-error.log*
 
 # local env files
 .env*.local
+.env
 
 # vercel
 .vercel
 
+# netlify
+.netlify
+/netlify/functions/
+.netlify.toml.bak
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# IDE
+.vscode/settings.json
+.idea/

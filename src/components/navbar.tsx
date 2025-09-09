@@ -2,11 +2,18 @@
 
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import { useState } from 'react'
 import { useAppContext } from '../context/AppContext'
+import PointsCounter from './PointsCounter'
+import AchievementModal from './AchievementModal'
+import LeaderboardModal from './LeaderboardModal'
+import { TrophyIcon, SparklesIcon } from '@heroicons/react/24/outline'
 
 export function Navbar() {
   const { user, isAuthenticated, logout } = useAppContext()
   const router = useRouter()
+  const [showAchievements, setShowAchievements] = useState(false)
+  const [showLeaderboard, setShowLeaderboard] = useState(false)
 
   const handleLogout = () => {
     logout()
@@ -48,6 +55,32 @@ export function Navbar() {
           <div className="flex items-center space-x-4">
             {isAuthenticated ? (
               <div className="flex items-center space-x-3">
+                {/* Gamification Elements - Hidden for Admin */}
+                {user?.role !== 'admin' && (
+                  <>
+                    <PointsCounter className="hidden md:flex" />
+                    
+                    {/* Gamification Action Buttons */}
+                    <div className="flex items-center space-x-2">
+                      <button
+                        onClick={() => setShowAchievements(true)}
+                        className="p-2 text-yellow-600 hover:bg-yellow-50 rounded-full transition-colors"
+                        title="View Achievements"
+                      >
+                        <SparklesIcon className="h-5 w-5" />
+                      </button>
+                      
+                      <button
+                        onClick={() => setShowLeaderboard(true)}
+                        className="p-2 text-purple-600 hover:bg-purple-50 rounded-full transition-colors"
+                        title="View Leaderboard"
+                      >
+                        <TrophyIcon className="h-5 w-5" />
+                      </button>
+                    </div>
+                  </>
+                )}
+                
                 {/* User Info */}
                 <div className="hidden md:block text-right">
                   <p className="text-sm font-medium text-gray-900">{user?.name}</p>
@@ -90,6 +123,17 @@ export function Navbar() {
           </div>
         </div>
       </div>
+      
+      {/* Gamification Modals */}
+      <AchievementModal
+        isOpen={showAchievements}
+        onClose={() => setShowAchievements(false)}
+      />
+      
+      <LeaderboardModal
+        isOpen={showLeaderboard}
+        onClose={() => setShowLeaderboard(false)}
+      />
     </nav>
   )
 }
