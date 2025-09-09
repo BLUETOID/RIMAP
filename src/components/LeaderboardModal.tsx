@@ -29,7 +29,9 @@ export const LeaderboardModal: React.FC<LeaderboardModalProps> = ({ isOpen, onCl
     }
   }, [isOpen, onClose])
   
-  if (!isOpen || !user || user.role === 'admin') return null
+  const shouldHide = !isOpen || !user || user.role === 'admin'
+  
+  if (shouldHide) return null
   
   const currentLeaderboard = leaderboards.find(lb => lb.category === activeCategory)
   

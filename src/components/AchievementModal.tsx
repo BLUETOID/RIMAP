@@ -29,8 +29,10 @@ export const AchievementModal: React.FC<AchievementModalProps> = ({ isOpen, onCl
     }
   }, [isOpen, onClose])
 
-  // Don't show for admin users
-  if (!isOpen || !user || user.role === 'admin') return null
+  // Don't show for admin users or when user is null
+  const shouldHide = !isOpen || !user || user.role === 'admin'
+  
+  if (shouldHide) return null
 
   const userAchievements = user.achievements || []
   

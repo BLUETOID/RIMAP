@@ -38,7 +38,9 @@ export default function AlumniDashboard() {
     }
   }, [isAuthenticated, user, router])
 
-  if (!isAuthenticated || user?.role !== 'alumni') {
+  const shouldShowLoading = !isAuthenticated || user?.role !== 'alumni'
+
+  if (shouldShowLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>

@@ -110,6 +110,7 @@ type AppContextType = {
   login: (email: string, password: string) => Promise<{ success: boolean; user?: User }>
   logout: () => void
   isAuthenticated: boolean
+  isHydrated: boolean
   
   // Alumni
   alumni: Alumni[]
@@ -634,13 +635,19 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const logout = () => {
     try {
       console.log('Logout initiated')
-      setUser(null)
+      
+      // Clear localStorage first
       if (typeof window !== 'undefined') {
         localStorage.removeItem('currentUser')
         console.log('User data cleared from localStorage')
       }
+      
+      // Set user to null - this will trigger redirects
+      setUser(null)
     } catch (error) {
       console.error('Error during logout:', error)
+      // Even if there's an error, ensure user is logged out
+      setUser(null)
     }
   }
 
@@ -1040,6 +1047,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     login,
     logout,
     isAuthenticated: !!user && isHydrated,
+    isHydrated,
     
     // Alumni
     alumni,

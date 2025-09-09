@@ -30,8 +30,10 @@ export const GamificationDashboard: React.FC<GamificationDashboardProps> = ({ cl
     return () => clearInterval(timer)
   }, [])
   
-  // Don't show gamification for admin users
-  if (!user || user.role === 'admin') return null
+  // Don't show gamification for admin users or when user is null
+  const shouldHide = !user || user.role === 'admin'
+  
+  if (shouldHide) return null
   
   const stats = getGamificationStats()
   const unlockedAchievements = achievements.filter(achievement => 

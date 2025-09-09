@@ -3,17 +3,19 @@
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
-import { useHydratedAppContext } from '../context/HydratedAppContext'
-import { TrophyIcon, SparklesIcon, Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
+import { useAppContext } from '../context/AppContext'
+import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline'
 
 export function Navbar() {
-  const { user, isAuthenticated, logout } = useHydratedAppContext()
+  const { user, isAuthenticated, logout } = useAppContext()
   const router = useRouter()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   const handleLogout = () => {
     try {
+      console.log('Navbar logout initiated')
       logout()
+      // Immediately redirect to avoid rendering issues during state transition
       router.push('/')
     } catch (error) {
       console.error('Error during logout:', error)
@@ -62,53 +64,6 @@ export function Navbar() {
           <div className="flex items-center space-x-2 md:space-x-4">
             {isAuthenticated ? (
               <>
-                {/* Desktop Gamification Elements - Hidden for Admin */}
-                {user?.role !== 'admin' && (
-                  <div className="hidden md:flex items-center space-x-3">
-                    <PointsCounter className="flex" />
-                    
-                    {/* Gamification Action Buttons */}
-                    <div className="flex items-center space-x-2">
-                      <button
-                        onClick={() => setShowAchievements(true)}
-                        className="p-2 text-yellow-600 hover:bg-yellow-50 rounded-full transition-colors"
-                        title="View Achievements"
-                      >
-                        <SparklesIcon className="h-5 w-5" />
-                      </button>
-                      
-                      <button
-                        onClick={() => setShowLeaderboard(true)}
-                        className="p-2 text-purple-600 hover:bg-purple-50 rounded-full transition-colors"
-                        title="View Leaderboard"
-                      >
-                        <TrophyIcon className="h-5 w-5" />
-                      </button>
-                    </div>
-                  </div>
-                )}
-                
-                {/* Mobile Gamification Elements - Hidden for Admin */}
-                {user?.role !== 'admin' && (
-                  <div className="md:hidden flex items-center space-x-2">
-                    <button
-                      onClick={() => setShowAchievements(true)}
-                      className="p-1.5 text-yellow-600 hover:bg-yellow-50 rounded-full transition-colors"
-                      title="Achievements"
-                    >
-                      <SparklesIcon className="h-4 w-4" />
-                    </button>
-                    
-                    <button
-                      onClick={() => setShowLeaderboard(true)}
-                      className="p-1.5 text-purple-600 hover:bg-purple-50 rounded-full transition-colors"
-                      title="Leaderboard"
-                    >
-                      <TrophyIcon className="h-4 w-4" />
-                    </button>
-                  </div>
-                )}
-                
                 {/* Desktop User Info */}
                 <div className="hidden md:block text-right">
                   <p className="text-sm font-medium text-gray-900">{user?.name}</p>
@@ -171,11 +126,6 @@ export function Navbar() {
               <div className="px-3 py-2 border-b border-gray-100">
                 <p className="text-sm font-medium text-gray-900">{user?.name}</p>
                 <p className="text-xs text-gray-500 capitalize">{user?.role}</p>
-                {user?.role !== 'admin' && (
-                  <div className="mt-2">
-                    <PointsCounter className="text-xs" />
-                  </div>
-                )}
               </div>
               
               {/* Mobile Navigation Links */}
@@ -232,17 +182,6 @@ export function Navbar() {
           </div>
         )}
       </div>
-      
-      {/* Gamification Modals */}
-      <AchievementModal
-        isOpen={showAchievements}
-        onClose={() => setShowAchievements(false)}
-      />
-      
-      <LeaderboardModal
-        isOpen={showLeaderboard}
-        onClose={() => setShowLeaderboard(false)}
-      />
     </nav>
   )
 }

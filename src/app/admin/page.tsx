@@ -31,32 +31,6 @@ export default function AdminPage() {
   const [selectedYear, setSelectedYear] = useState('')
   const [selectedStatus, setSelectedStatus] = useState('')
 
-  useEffect(() => {
-    if (!isAuthenticated) {
-      router.push('/auth/login')
-      return
-    }
-    
-    if (user?.role !== 'admin') {
-      // Redirect to appropriate dashboard based on role
-      if (user?.role === 'alumni') {
-        router.push('/dashboard/alumni')
-      } else if (user?.role === 'student') {
-        router.push('/dashboard/student')
-      } else {
-        router.push('/')
-      }
-    }
-  }, [isAuthenticated, user, router])
-
-  if (!isAuthenticated || user?.role !== 'admin') {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-      </div>
-    )
-  }
-
   // Mock students data for admin management
   const [students] = useState([
     {
@@ -112,6 +86,34 @@ export default function AdminPage() {
       lastLogin: '2024-01-18'
     }
   ])
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      router.push('/auth/login')
+      return
+    }
+    
+    if (user?.role !== 'admin') {
+      // Redirect to appropriate dashboard based on role
+      if (user?.role === 'alumni') {
+        router.push('/dashboard/alumni')
+      } else if (user?.role === 'student') {
+        router.push('/dashboard/student')
+      } else {
+        router.push('/')
+      }
+    }
+  }, [isAuthenticated, user, router])
+
+  const shouldShowLoading = !isAuthenticated || user?.role !== 'admin'
+
+  if (shouldShowLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      </div>
+    )
+  }
 
   // Enhanced alumni data with more details
   const enhancedAlumni = alumni.map(alum => ({

@@ -3,10 +3,10 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { useHydratedAppContext } from '../../../context/HydratedAppContext'
+import { useAppContext } from '../../../context/AppContext'
 
 export default function LoginPage() {
-  const { login } = useHydratedAppContext()
+  const { login, user } = useAppContext()
   const router = useRouter()
   const [formData, setFormData] = useState({
     email: '',
@@ -29,20 +29,26 @@ export default function LoginPage() {
     try {
       const result = await login(formData.email, formData.password)
       
-      if (result.success && result.user) {
-        // Role-based redirect
-        switch (result.user.role) {
-          case 'admin':
-            router.push('/admin')
-            break
-          case 'alumni':
-            router.push('/dashboard/alumni')
-            break
-          case 'student':
-            router.push('/dashboard/student')
-            break
-          default:
-            router.push('/')
+      if (result.success) {
+        // Use the user from context since login sets it
+        if (user) {
+          // Role-based redirect
+          switch (user.role) {
+            case 'admin':
+              router.push('/admin')
+              break
+            case 'alumni':
+              router.push('/dashboard/alumni')
+              break
+            case 'student':
+              router.push('/dashboard/student')
+              break
+            default:
+              router.push('/')
+          }
+        } else {
+          // Fallback redirect
+          router.push('/')
         }
       } else {
         setError('Invalid email or password')

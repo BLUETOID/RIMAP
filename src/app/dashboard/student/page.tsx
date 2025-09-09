@@ -38,7 +38,9 @@ export default function StudentDashboard() {
     }
   }, [isAuthenticated, user, router])
 
-  if (!isAuthenticated || user?.role !== 'student') {
+  const shouldShowLoading = !isAuthenticated || user?.role !== 'student'
+
+  if (shouldShowLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600"></div>

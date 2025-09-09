@@ -1,6 +1,6 @@
 import './globals.css'
-import { Navbar } from '../components/SimpleNavbar'
-import { HydratedAppProvider } from '../context/HydratedAppContext'
+import { Navbar } from '../components/navbar'
+import { AppProvider } from '../context/AppContext'
 import ErrorBoundary from '../components/ErrorBoundary'
 
 export const metadata = {
@@ -17,12 +17,12 @@ export default function RootLayout({
     <html lang="en">
       <body className="font-sans">
         <ErrorBoundary>
-          <HydratedAppProvider>
+          <AppProvider>
             <Navbar />
             <main className="min-h-screen bg-gray-50">
               {children}
             </main>
-          </HydratedAppProvider>
+          </AppProvider>
         </ErrorBoundary>
       </body>
     </html>

@@ -2,12 +2,12 @@
 
 import Link from 'next/link'
 import { HeroSection } from '../components/hero-section'
-import { useHydratedAppContext } from '../context/HydratedAppContext'
+import { useAppContext } from '../context/AppContext'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 
 export default function Home() {
-  const { isAuthenticated, user, isHydrated } = useHydratedAppContext()
+  const { isAuthenticated, user, isHydrated } = useAppContext()
   const router = useRouter()
   const [isClient, setIsClient] = useState(false)
 
@@ -35,7 +35,9 @@ export default function Home() {
   }, [isClient, isHydrated, isAuthenticated, user, router])
 
   // Show loading spinner while hydrating or redirecting authenticated users
-  if (!isClient || !isHydrated || (isAuthenticated && user)) {
+  const shouldShowLoading = !isClient || !isHydrated || (isAuthenticated && user)
+  
+  if (shouldShowLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">

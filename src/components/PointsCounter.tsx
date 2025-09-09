@@ -19,9 +19,6 @@ export const PointsCounter: React.FC<PointsCounterProps> = ({
   const [previousPoints, setPreviousPoints] = useState(0)
   const [isAnimating, setIsAnimating] = useState(false)
   
-  // Don't show gamification for admin users
-  if (!user || user.role === 'admin') return null
-  
   const stats = getGamificationStats()
   
   // Animate when points change
@@ -33,6 +30,11 @@ export const PointsCounter: React.FC<PointsCounterProps> = ({
     }
     setPreviousPoints(stats.totalPoints)
   }, [stats.totalPoints, previousPoints, animated])
+  
+  // Don't show gamification for admin users or when user is null/undefined
+  const shouldHide = !user || user.role === 'admin'
+  
+  if (shouldHide) return null
   
   const getLevelConfig = (level: string) => {
     switch (level) {
