@@ -543,14 +543,31 @@ export function AppProvider({ children }: { children: ReactNode }) {
     
     // Only access localStorage after hydration
     if (typeof window !== 'undefined') {
-      const savedUser = localStorage.getItem('currentUser')
-      if (savedUser) {
-        try {
-          setUser(JSON.parse(savedUser))
-        } catch (error) {
-          console.error('Failed to parse saved user data:', error)
-          localStorage.removeItem('currentUser')
+      try {
+        const savedUser = localStorage.getItem('currentUser')
+        if (savedUser) {
+          const parsedUser = JSON.parse(savedUser)
+          
+          // Validate required fields
+          if (parsedUser && parsedUser.id && parsedUser.email && parsedUser.role) {
+            // Ensure all required fields have default values
+            const validatedUser = {
+              ...parsedUser,
+              totalPoints: parsedUser.totalPoints || 0,
+              achievements: parsedUser.achievements || [],
+              challenges: parsedUser.challenges || [],
+              loginStreak: parsedUser.loginStreak || 0,
+              lastLoginDate: parsedUser.lastLoginDate || new Date().toISOString()
+            }
+            setUser(validatedUser)
+          } else {
+            console.warn('Invalid user data in localStorage')
+            localStorage.removeItem('currentUser')
+          }
         }
+      } catch (error) {
+        console.error('Failed to parse saved user data:', error)
+        localStorage.removeItem('currentUser')
       }
     }
   }, [])
@@ -562,12 +579,21 @@ export function AppProvider({ children }: { children: ReactNode }) {
     if (foundUser) {
       const { password: _, ...userWithoutPassword } = foundUser
       
-      // Calculate login streak
+      // Calculate login streak with defensive date handling
       const today = new Date().toDateString()
-      const lastLoginDate = new Date(userWithoutPassword.lastLoginDate).toDateString()
-      const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000).toDateString()
+      let lastLoginDate: string
+      let yesterday: string
       
-      let newLoginStreak = userWithoutPassword.loginStreak
+      try {
+        lastLoginDate = new Date(userWithoutPassword.lastLoginDate || new Date()).toDateString()
+        yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000).toDateString()
+      } catch (error) {
+        console.error('Date parsing error:', error)
+        lastLoginDate = today
+        yesterday = today
+      }
+      
+      let newLoginStreak = userWithoutPassword.loginStreak || 0
       
       if (lastLoginDate === yesterday) {
         // Consecutive day login

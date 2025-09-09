@@ -1,6 +1,7 @@
 import './globals.css'
 import { Navbar } from '../components/navbar'
 import { AppProvider } from '../context/AppContext'
+import ErrorBoundary from '../components/ErrorBoundary'
 
 export const metadata = {
   title: 'Alumni Connect',
@@ -15,12 +16,14 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="font-sans">
-        <AppProvider>
-          <Navbar />
-          <main className="min-h-screen bg-gray-50">
-            {children}
-          </main>
-        </AppProvider>
+        <ErrorBoundary>
+          <AppProvider>
+            <Navbar />
+            <main className="min-h-screen bg-gray-50">
+              {children}
+            </main>
+          </AppProvider>
+        </ErrorBoundary>
       </body>
     </html>
   )
