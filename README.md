@@ -1,4 +1,4 @@
-# Alumni Connect
+# RIMAAP
 
 A comprehensive alumni networking platform built with Next.js, TypeScript, and Tailwind CSS. This application helps alumni and students connect, find mentors, attend events, and contribute to their alma mater.
 
@@ -175,4 +175,4 @@ For support, email support@alumniconnect.com or join our Slack channel.
 
 ---
 
-Built with ❤️ by the Alumni Connect Team
+Built with ❤️ by the RIMAAP Team

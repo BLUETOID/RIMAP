@@ -4,7 +4,7 @@ import { AppProvider } from '../context/AppContext'
 import ErrorBoundary from '../components/ErrorBoundary'
 
 export const metadata = {
-  title: 'Alumni Connect',
+  title: 'RIMAAP',
   description: 'Connect with your alumni network',
 }
 

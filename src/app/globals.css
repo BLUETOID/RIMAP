@@ -31,3 +31,54 @@ body {
     text-wrap: balance;
   }
 }
+
+/* Mobile specific improvements */
+@layer components {
+  /* Improve touch targets for mobile */
+  .btn-mobile {
+    @apply min-h-[44px] min-w-[44px];
+  }
+  
+  /* Better spacing for mobile cards */
+  .card-mobile {
+    @apply p-4 sm:p-6;
+  }
+  
+  /* Responsive text sizing */
+  .text-responsive-xl {
+    @apply text-lg sm:text-xl md:text-2xl;
+  }
+  
+  .text-responsive-2xl {
+    @apply text-xl sm:text-2xl md:text-3xl;
+  }
+  
+  /* Mobile-friendly modals */
+  .modal-mobile {
+    @apply mx-4 sm:mx-auto;
+  }
+  
+  /* Better form inputs for mobile */
+  .input-mobile {
+    @apply text-base; /* Prevents zoom on iOS */
+  }
+}
+
+/* Prevent horizontal scrolling on mobile */
+html {
+  overflow-x: hidden;
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Better focus styles for accessibility */
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  @apply outline-2 outline-offset-2 outline-blue-600;
+}
