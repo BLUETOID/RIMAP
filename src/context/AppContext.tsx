@@ -500,6 +500,7 @@ const mockLeaderboards: Leaderboard[] = [
 
 export function AppProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
+  const [isHydrated, setIsHydrated] = useState(false)
   const [alumni, setAlumni] = useState<Alumni[]>(mockAlumni)
   const [events, setEvents] = useState<Event[]>(mockEvents)
   const [donations, setDonations] = useState<Donation[]>(mockDonations)
@@ -535,11 +536,22 @@ export function AppProvider({ children }: { children: ReactNode }) {
     }
   ])
 
-  // Load user from localStorage on app start
+  // Load user from localStorage on app start (client-side only)
   useEffect(() => {
-    const savedUser = localStorage.getItem('currentUser')
-    if (savedUser) {
-      setUser(JSON.parse(savedUser))
+    // Mark as hydrated on client side
+    setIsHydrated(true)
+    
+    // Only access localStorage after hydration
+    if (typeof window !== 'undefined') {
+      const savedUser = localStorage.getItem('currentUser')
+      if (savedUser) {
+        try {
+          setUser(JSON.parse(savedUser))
+        } catch (error) {
+          console.error('Failed to parse saved user data:', error)
+          localStorage.removeItem('currentUser')
+        }
+      }
     }
   }, [])
 
@@ -572,7 +584,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
       }
       
       setUser(updatedUser)
-      localStorage.setItem('currentUser', JSON.stringify(updatedUser))
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('currentUser', JSON.stringify(updatedUser))
+      }
       
       // Award daily login points (only if not logged in today)
       if (lastLoginDate !== today) {
@@ -593,7 +607,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   const logout = () => {
     setUser(null)
-    localStorage.removeItem('currentUser')
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('currentUser')
+    }
   }
 
   // Alumni functions
@@ -991,7 +1007,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     user,
     login,
     logout,
-    isAuthenticated: !!user,
+    isAuthenticated: !!user && isHydrated,
     
     // Alumni
     alumni,

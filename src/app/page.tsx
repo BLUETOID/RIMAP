@@ -4,14 +4,19 @@ import Link from 'next/link'
 import { HeroSection } from '../components/hero-section'
 import { useAppContext } from '../context/AppContext'
 import { useRouter } from 'next/navigation'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 
 export default function Home() {
   const { isAuthenticated, user } = useAppContext()
   const router = useRouter()
+  const [isClient, setIsClient] = useState(false)
 
   useEffect(() => {
-    if (isAuthenticated && user) {
+    setIsClient(true)
+  }, [])
+
+  useEffect(() => {
+    if (isClient && isAuthenticated && user) {
       // Redirect authenticated users to their role-specific dashboards
       switch (user.role) {
         case 'admin':
@@ -27,15 +32,17 @@ export default function Home() {
           break
       }
     }
-  }, [isAuthenticated, user, router])
+  }, [isClient, isAuthenticated, user, router])
 
-  // Show loading spinner while redirecting authenticated users
-  if (isAuthenticated && user) {
+  // Show loading spinner while hydrating or redirecting authenticated users
+  if (!isClient || (isAuthenticated && user)) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Redirecting to your dashboard...</p>
+          <p className="text-gray-600">
+            {!isClient ? 'Loading...' : 'Redirecting to your dashboard...'}
+          </p>
         </div>
       </div>
     )
