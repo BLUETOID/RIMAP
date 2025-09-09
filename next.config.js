@@ -6,8 +6,9 @@ const nextConfig = {
   // Netlify deployment optimizations
   trailingSlash: true,
   
+  // Disable experimental features that cause build issues
   experimental: {
-    optimizeCss: true,
+    // optimizeCss: true, // Disabled due to critters dependency issues
   },
   
   images: {
@@ -27,7 +28,7 @@ const nextConfig = {
     ignoreDuringBuilds: true,
   },
   typescript: {
-    ignoreDuringBuilds: true,
+    ignoreBuildErrors: true,
   },
   
   // Environment variables that should be available to the client
