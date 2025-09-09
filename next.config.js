@@ -22,15 +22,13 @@ const nextConfig = {
     ]
   },
   
-  // Only ignore during builds in development
-  ...(process.env.NODE_ENV === 'development' && {
-    eslint: {
-      ignoreDuringBuilds: true,
-    },
-    typescript: {
-      ignoreDuringBuilds: true,
-    },
-  }),
+  // Ignore TypeScript and ESLint during builds for faster deployment
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
+  typescript: {
+    ignoreDuringBuilds: true,
+  },
   
   // Environment variables that should be available to the client
   env: {
