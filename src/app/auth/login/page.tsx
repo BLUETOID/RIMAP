@@ -3,10 +3,10 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { useAppContext } from '../../../context/AppContext'
+import { useHydratedAppContext } from '../../../context/HydratedAppContext'
 
 export default function LoginPage() {
-  const { login } = useAppContext()
+  const { login } = useHydratedAppContext()
   const router = useRouter()
   const [formData, setFormData] = useState({
     email: '',

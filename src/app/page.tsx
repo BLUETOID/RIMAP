@@ -2,12 +2,12 @@
 
 import Link from 'next/link'
 import { HeroSection } from '../components/hero-section'
-import { useAppContext } from '../context/AppContext'
+import { useHydratedAppContext } from '../context/HydratedAppContext'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 
 export default function Home() {
-  const { isAuthenticated, user } = useAppContext()
+  const { isAuthenticated, user, isHydrated } = useHydratedAppContext()
   const router = useRouter()
   const [isClient, setIsClient] = useState(false)
 
@@ -16,7 +16,7 @@ export default function Home() {
   }, [])
 
   useEffect(() => {
-    if (isClient && isAuthenticated && user) {
+    if (isClient && isHydrated && isAuthenticated && user) {
       // Redirect authenticated users to their role-specific dashboards
       switch (user.role) {
         case 'admin':
@@ -32,10 +32,10 @@ export default function Home() {
           break
       }
     }
-  }, [isClient, isAuthenticated, user, router])
+  }, [isClient, isHydrated, isAuthenticated, user, router])
 
   // Show loading spinner while hydrating or redirecting authenticated users
-  if (!isClient || (isAuthenticated && user)) {
+  if (!isClient || !isHydrated || (isAuthenticated && user)) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
